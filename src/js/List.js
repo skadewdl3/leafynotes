@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import {
+  DeleteOutlined,
+  PlusCircleOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import DebouncedInput from './DebouncedInput';
+import ListItem from './ListItem';
 
 const List = ({
   name,
   setName,
   items,
   addItem,
+  setItem,
   deleteItem,
   deleteList,
   index,
 }) => {
-  const [editable, setEditable] = useState(false);
   const changeName = newName => setName(index, newName);
 
   useEffect(() => {
@@ -21,27 +27,43 @@ const List = ({
     <div className="list">
       <div className="list__controls">
         <DebouncedInput
-          className={`list__name ${
-            editable ? '' : 'list__name--disabled'
-          } list__name--${index}`}
-          disabled={!editable}
+          className={`list__name list__name--${index}`}
+          disabled={false}
           defaultValue={name}
           callback={changeName}
         />
         <div className="list__controls--right">
           <button
             className="list__control"
-            onClick={() => setEditable(!editable)}
+            onClick={() => {
+              let item = {
+                title: 'Todo Item',
+                description:
+                  'Write a short description to help you remember this todo better.',
+              };
+              addItem(index, item);
+            }}
           >
-            <i className={`fa fa-icon fa-${editable ? 'check' : 'pencil'}`}></i>
-          </button>
-          <button className="list__control">
-            <i className="fa fa-icon fa-plus"></i>
+            <PlusCircleOutlined />
           </button>
           <button className="list__control" onClick={() => deleteList(index)}>
-            <i className="fa fa-icon fa-trash-o"></i>
+            <CloseOutlined />
           </button>
         </div>
+      </div>
+      <div className="list__items">
+        {items.map((item, i) => (
+          <ListItem
+            key={i}
+            item={item}
+            title={item.title}
+            description={item.description}
+            listIndex={index}
+            index={i}
+            setItem={setItem}
+            deleteItem={deleteItem}
+          />
+        ))}
       </div>
     </div>
   );

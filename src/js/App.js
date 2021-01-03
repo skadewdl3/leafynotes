@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { listState } from './state';
 import { chunk } from 'lodash';
+import { PlusOutlined } from '@ant-design/icons';
 
 import List from './List';
 
 const App = () => {
   const chunkSize = 4;
   const [lists, setLists] = useRecoilState(listState);
+
+  useEffect(() => {
+    let persistedData = localStorage.getItem('leafyNotes');
+    if (persistedData) setLists(JSON.parse(persistedData));
+  }, []);
 
   const setName = (index, name) => {
     let newLists = lists.map((cur, i) =>
@@ -22,6 +28,19 @@ const App = () => {
         ? {
             ...cur,
             items: [...cur.items, item],
+          }
+        : cur
+    );
+    console.log(newLists);
+    setLists(newLists);
+  };
+
+  const setItem = (listIndex, index, newItem) => {
+    let newLists = lists.map((cur, i) =>
+      i === listIndex
+        ? {
+            ...cur,
+            items: cur.items.map((item, j) => (index === j ? newItem : item)),
           }
         : cur
     );
@@ -51,9 +70,7 @@ const App = () => {
   };
 
   const deleteList = index => {
-    console.log(lists);
     let newList = lists.filter((cur, i) => i !== index);
-    console.log(newList);
     setLists(newList);
   };
 
@@ -76,7 +93,7 @@ const App = () => {
         <div className="lists">
           <div className="lists__buttons">
             <button className="lists__btn" onClick={() => createNewList()}>
-              <i className="fa fa-icon fa-plus"></i>
+              <PlusOutlined />
               <span>Create List</span>
             </button>
           </div>
@@ -97,6 +114,7 @@ const App = () => {
                     addItem={addItem}
                     deleteItem={deleteItem}
                     deleteList={deleteList}
+                    setItem={setItem}
                   />
                 ))}
               </div>
